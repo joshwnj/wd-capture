@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>wd-capture example</title>
+
+        <script>
+/**
+ * Send back some information about this page
+ */
+var getPageData = function (callback) {
+    var funcs = {
+        title: function (cb) {
+            cb(document.title);
+        },
+        image_width: function (cb) {
+            var interval = setInterval(function () {
+                var img = document.getElementById('profile-pic');
+                var is_ready = img && img.width;
+                if (!is_ready) { return; }
+
+                clearInterval(interval);
+                cb(img.width);
+            }, 100);
+        }
+    };
+
+    var keys = Object.keys(funcs);
+    var remaining = keys.length;
+    var data = {};
+    var add = function (key, value) {
+        data[key] = value;
+        remaining -= 1;
+        if (remaining === 0) {
+            callback(data);
+        }
+    }
+
+    keys.forEach(function (key) {
+        funcs[key](function (val) {
+            add(key, val);
+        });
+    });
+}
+
+var interval = setInterval(function () {
+    if (typeof window.wdCapture !== 'function') { return; }
+
+    clearInterval(interval);
+    getPageData(window.wdCapture);
+}, 100);
+        </script>
+    </head>
+    <body>
+        <h1>Example of wd-capture</h1>
+        <img id="profile-pic" src="https://pbs.twimg.com/profile_banners/12086372/1376067558/web" />
+    </body>
+</html>
